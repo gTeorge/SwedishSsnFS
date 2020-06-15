@@ -11,8 +11,7 @@ module Console =
                 Console.BackgroundColor <- bclr
                 printf "%s" s
                 Console.ResetColor())
-    let blue = log ConsoleColor.Yellow ConsoleColor.DarkBlue
-    let red = log ConsoleColor.Yellow ConsoleColor.DarkRed
+    let error = log ConsoleColor.Yellow ConsoleColor.DarkRed
 
 module String = 
     let padLeft (num: int) (str: string) =
@@ -63,9 +62,10 @@ module Generator =
         |> addRandomNums 3
         |> addCheckSum
 
-    let getOrganizationSSN =
-        (Dates.getRandomDate |> int) + 20000 
+    let getOrganisationSSN =
+        (Dates.getRandomDate |> int) + 2000 
         |> string
+        |> String.padLeft 6
         |> addRandomNums 3
         |> addCheckSum
 
@@ -73,13 +73,14 @@ module Generator =
 
 [<EntryPoint>]
 let main argv =
-    Generator.getPrivateSSN
-    |> String.join "Private SSN:       "
-    |> sprintf "%s"
-    |> Console.blue
-    printfn ""
-    Generator.getOrganizationSSN
-    |> String.join "Organization SSN:  "
-    |> sprintf "%s"
-    |> Console.red
+    match argv with
+    | [||] -> Generator.getPrivateSSN
+              |> String.join "Private SSN:       "
+              |> printfn "%s"
+              Generator.getOrganisationSSN
+              |> String.join "Organisation SSN:  "
+              |> printfn "%s"
+    | _ -> "Unexpected run parameters"
+           |> sprintf "%s"
+           |> Console.error
     0
